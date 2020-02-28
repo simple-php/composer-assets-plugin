@@ -47,6 +47,7 @@
 			$assetsTargets = $this->getAssetsTargets($config, $assetsDirectory);
 			$directories = $this->prepareDirectories($assetsDirectory, $assetsTargets);
 			$packages = $localRepository->getCanonicalPackages();
+            $vendorDir = $config->get('vendor-dir');
 
 			if (empty($packages)) {
 				return;
@@ -58,7 +59,19 @@
 			foreach ($packages as $package) {
 				$packageName = $package->getPrettyName();
 				$directory = $assetsDirectory;
-				$targetDirectory = $assetsDirectory . '/' . $packageName;
+
+                $extra = $package->getExtra();
+				if (isset($extra['assets-target'])) {
+                    $targetDirectory = $extra['assets-target'];
+                    if ($this->filesystem->isAbsolutePath($targetDirectory)) {
+					    $targetDirectory = $this->filesystem->normalizePath($vendorDir . '/..' . $targetDirectory);
+                        //$directory = $targetDirectory;
+                    } else {
+                        $targetDirectory = $assetsDirectory . '/' . $targetDirectory;
+                    }
+				} else {
+					$targetDirectory = $assetsDirectory . '/' . $packageName;
+				}
 
 				if (isset($assetsTargets[$packageName])) {
 					$targetDirectory = $assetsTargets[$packageName];

@@ -11,7 +11,7 @@ Composer plugin for installing assets.
 Use [Composer](http://getcomposer.org/):
 
 ```
-composer require frontpack/composer-assets-plugin
+composer require simple-php/composer-assets-plugin
 ```
 
 Library requires PHP 5.4.0 or later.
@@ -49,6 +49,41 @@ Example:
 * `static/plugin.css` - symlinks file to `assets/org/package/plugin.css`
 * `static/icons.png` - symlinks file to `assets/org/package/icons.png`
 
+By default, assets files stored in `assets-dir` specified in root package composer config. Package name used as path, for example, for package 
+`package-owner`/`package-name` following path will be used by default: `assets-dir`/`package-owner`/`package-name`.
+You can specify different default path for package with option `assets-target` in section `extra`:
+
+* `assets-target` target path to copy assets files, optional
+    * if relative path specified it will be related to `assets-dir`
+    * if absolute path specified it will be related to parent of `vendor-dir`
+
+Example:
+
+``` json
+{
+    "extra": {
+        "assets-target": "package1",
+        "assets-files": [
+               ... some assets files ...
+        ]
+    }
+}
+
+Relative path specified, assets files will be copied to `assets-dir`/package1
+
+``` json
+{
+    "extra": {
+        "assets-target": "/templates/default/js",
+        "assets-files": [
+               ... some assets files ...
+        ]
+    }
+}
+
+Absolute path specified, assets files will be copied to `project-dir`/templates/default/js, where `project-dir` is parent directory of composer `vendor-dir`
+IMPORTANT: Assets files will not be cleaned on package update or removing, if default absolute path for `assets-target` is used. 
+If you need automatic cleanup of assets files for this package you must redefine `assets-target` for this package in root package config.
 
 ### Root package
 
