@@ -237,7 +237,10 @@
 			if (isset($extra['assets-files'])) {
 				$this->processFiles($packageName, $packageDir, $packageAssetsDir, $extra['assets-files'], $strategy);
 				return TRUE;
-			}
+			} elseif (isset($extra['assets-dir']) && is_string($extra['assets-dir'])) {
+                $this->processFiles($packageName, $packageDir, $packageAssetsDir, $extra['assets-dir'], $strategy, true);			    
+				return TRUE;
+            }
 
 			// default config
 			$defaultMapping = $this->getDefaultMapping();
@@ -285,14 +288,15 @@
 		 * @param  string
 		 * @return void
 		 */
-		private function processFiles($packageName, $sourceDir, $targetDir, $files, $strategy)
+		private function processFiles($packageName, $sourceDir, $targetDir, $files, $strategy, $wholeDir = false)
 		{
 			$this->io->write('<info>Manage assets for package ' . $packageName . '</info>');
 
 			if ($files === TRUE) { // whole package
 				$this->io->write('  - all files');
 				$this->createCopy($sourceDir, $targetDir, $strategy);
-
+            } elseif ($wholeDir) {
+                $this->processFile($sourceDir, $targetDir, $files, $packageName, $strategy, true);
 			} elseif (is_array($files)) {
 				foreach ($files as $file) {
 					$this->processFile($sourceDir, $targetDir, $file, $packageName, $strategy);
@@ -312,7 +316,7 @@
 		 * @param  string
 		 * @return void
 		 */
-		private function processFile($sourceDir, $targetDir, $file, $packageName, $strategy)
+		private function processFile($sourceDir, $targetDir, $file, $packageName, $strategy, $isDir = false)
 		{
 			$sourcePath = $sourceDir . '/' . $file;
 
@@ -327,7 +331,7 @@
 				$this->io->write('  - file ' . $file);
 			}
 
-			$this->createCopy($sourcePath, $targetDir . '/' . basename($file), $strategy);
+			$this->createCopy($sourcePath, $targetDir . ($isDir ? '' : '/' . basename($file)), $strategy);
 		}
 
 
